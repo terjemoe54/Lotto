@@ -8,8 +8,8 @@ import SwiftUI
 import SwiftData
 
 @Model
-class JackPot: Decodable {
-    @Attribute(.unique) var dato: Date
+final class JackPot: Decodable {
+   @Attribute(.unique) var dato: Date
     var nr1: Int
     var nr2: Int
     var nr3: Int
@@ -19,6 +19,25 @@ class JackPot: Decodable {
     var nr7: Int
     var nr8: Int
     var weekNr: Int = 0
+    
+    init(
+            dato: Date = .now,
+            nr1: Int = 0, nr2: Int = 0, nr3: Int = 0, nr4: Int = 0,
+            nr5: Int = 0, nr6: Int = 0, nr7: Int = 0, nr8: Int = 0,
+            weekNr: Int = 0
+        ) {
+            self.dato = dato
+            self.nr1 = nr1
+            self.nr2 = nr2
+            self.nr3 = nr3
+            self.nr4 = nr4
+            self.nr5 = nr5
+            self.nr6 = nr6
+            self.nr7 = nr7
+            self.nr8 = nr8
+            self.weekNr = weekNr
+        }
+
     
     private enum CodingKeys: String, CodingKey {
         case dato = "dato"

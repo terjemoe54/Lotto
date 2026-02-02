@@ -12,7 +12,7 @@ struct FirstView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \JackPot.dato, order: .forward) private var jackpots: [JackPot]
     @State private var showListRows = false
-    
+    @State private var showRegisterView = false
     var body: some View {
        NavigationStack {
            VStack {
@@ -20,6 +20,11 @@ struct FirstView: View {
                showListRows = true
               }
               .buttonStyle(.borderedProminent)
+               
+               Button("Registrere Trekning") {
+                showRegisterView = true
+               }
+               .buttonStyle(.borderedProminent)
            }
         }
         .task {  // Load Jackpot rows from lotto.json file if Swiftdata is empty
@@ -34,6 +39,11 @@ struct FirstView: View {
         .sheet(isPresented: $showListRows) {
         ListRowsView()
         }
+        
+        .sheet(isPresented: $showRegisterView) {
+            NewJackpotView()
+        }
+        
     }
     
     func loadJackpots() -> [JackPot] {

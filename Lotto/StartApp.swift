@@ -12,7 +12,7 @@ import SwiftData
 struct StartApp: App {
     var body: some Scene {
         WindowGroup {
-            FirstView()
+           FirstView()
         }
         .modelContainer(for: JackPot.self)
     }
