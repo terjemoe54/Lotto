@@ -95,6 +95,7 @@ struct NewJackpotView: View {
                             print("Save failed:", error.localizedDescription)
                         }
                     }
+                    .disabled((jackpot.nr1 < 1 || jackpot.nr2 < 1 || jackpot.nr3 < 1 || jackpot.nr4 < 1 || jackpot.nr5 < 1 || jackpot.nr6 < 1 || jackpot.nr7 < 1 || jackpot.nr8 < 1 ) || !jackpot.dato.isSaturday)
                     .buttonStyle(.borderedProminent)
                     
                 }
@@ -110,5 +111,13 @@ struct NewJackpotView: View {
         let calendar = Calendar.current
         // Returns 1-53
         return calendar.component(.weekOfYear, from: date)
+    }
+}
+
+extension Date {
+    var isSaturday: Bool {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.weekday], from: self)
+        return components.weekday == 7  // Sunday=1, Monday=2, ..., Saturday=7
     }
 }
