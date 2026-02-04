@@ -67,8 +67,8 @@ struct MyLotteryView: View {
                     
                     VStack(alignment: .center, spacing: 20) {
                         Group {
-                            Text("Nummer 1 til 34")
-                                .font(.subheadline).foregroundStyle(.secondary)
+                            Text("Registrer din kupong her")
+                                .font(.headline).foregroundStyle(.black)
                             TextField("1", text: $nr1Text)
                                 .keyboardType(.numberPad)
                                 .submitLabel(.next)
