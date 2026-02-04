@@ -18,6 +18,9 @@ struct ListRowsView: View {
             dismiss()
         }
         .buttonStyle(.borderedProminent)
+        
+        Text("Antall Trekninger: \(jackpots.count)")
+        
         List(jackpots) { jackpot in
             VStack(alignment: .leading) {
                 Text(formattedDate(jackpot.dato))

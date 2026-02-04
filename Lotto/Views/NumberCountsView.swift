@@ -1,5 +1,5 @@
 //
-//  StatView.swift
+//  NumberCountTestView.swift
 //  Lotto
 //
 //  Created by Terje Moe on 03/02/2026.
@@ -8,8 +8,8 @@
 import SwiftUI
 import SwiftData
 
-
 struct NumberCountsView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @State private var counts: [Int: Int] = [:]
     @State private var averageDaysBetween: [Int: Double] = [:]
@@ -25,6 +25,12 @@ struct NumberCountsView: View {
                 }
                 return lhs.1 > rhs.1 // highest count first
             }
+        Button("Ferdig") {
+            dismiss()
+        }
+        .buttonStyle(.borderedProminent)
+        
+        Text("Antall Number: \(sortedCounts.count)")
         
         List {
             ForEach(sortedCounts, id: \.0) { number, count in
@@ -47,8 +53,16 @@ struct NumberCountsView: View {
                             Text("Next: \(next, style: .date)")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
+                            let weekNumber = getWeekNumber(from: next)
+                            Text("Uke: \(weekNumber)")
+                                .font(.caption2)
+                                .bold()
+                                .foregroundStyle(.secondary)
                         } else {
                             Text("Next: -")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Text("Uke: _")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
@@ -59,6 +73,13 @@ struct NumberCountsView: View {
         }
         .onAppear(perform: loadCounts)
         .navigationTitle("Number counts")
+    }
+    
+    func getWeekNumber(from date: Date) -> Int {
+        // Use current calendar,, or specify for consistent results
+        let calendar = Calendar.current
+        // Returns 1-53
+        return calendar.component(.weekOfYear, from: date)
     }
     
     func frequencyForNumbers1to34(in numbers: [Int]) -> [Int: Int] {
@@ -182,5 +203,5 @@ struct NumberCountsView: View {
 
 #Preview {
     NumberCountsView()
-        .modelContainer(for: JackPot.self, inMemory: true)
 }
+

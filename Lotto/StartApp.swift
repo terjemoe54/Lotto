@@ -14,7 +14,7 @@ struct StartApp: App {
         WindowGroup {
            FirstView()
         }
-        .modelContainer(for: JackPot.self)
+        .modelContainer(for: [JackPot.self, Result.self])
     }
     init() {
         print(URL.applicationSupportDirectory.path(percentEncoded: false))
