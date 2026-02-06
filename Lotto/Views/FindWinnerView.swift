@@ -16,9 +16,9 @@ struct FindWinnerView: View {
     // Loading and error states
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
-
+    
     @Environment(\.modelContext) private var modelContext
-
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -26,7 +26,7 @@ struct FindWinnerView: View {
                     DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
                         .datePickerStyle(.compact)
                 }
-
+                
                 Section {
                     Button {
                         Task { await runComparison() }
@@ -38,14 +38,14 @@ struct FindWinnerView: View {
                     }
                     .disabled(isLoading)
                 }
-
+                
                 if let errorMessage {
                     Section("Error") {
                         Text(errorMessage)
                             .foregroundStyle(.red)
                     }
                 }
-
+                
                 Section("Matches") {
                     if comparisons.isEmpty {
                         Text("No comparisons yet. Choose a date and tap Compare.")
@@ -104,7 +104,7 @@ struct ResultComparison: Identifiable, Hashable {
     let result: ResultRow
     let jackpot: JackpotRow
     let matchedNumbers: [Int]
-
+    
     var matchCount: Int { matchedNumbers.count }
 }
 
@@ -132,7 +132,7 @@ extension FindWinnerView {
             )
         }
     }
-
+    
     /// Fetch the jackpot row for the given date from the SwiftData model.
     func fetchJackpot(for date: Date) async throws -> JackpotRow? {
         let dayStart = normalize(date)
@@ -161,7 +161,7 @@ extension FindWinnerView {
         let comps = Calendar.current.dateComponents([.year, .month, .day], from: date)
         return Calendar.current.date(from: comps) ?? date
     }
-
+    
     /// Runs the comparison for the selected date using the SwiftData fetch.
     func runComparison() async {
         await MainActor.run {
@@ -169,14 +169,14 @@ extension FindWinnerView {
             errorMessage = nil
             comparisons = []
         }
-
+        
         do {
             let date = normalize(selectedDate)
             async let resultsTask = fetchResults(for: date)
             async let jackpotTask = fetchJackpot(for: date)
-
+            
             let (results, jackpotOpt) = try await (resultsTask, jackpotTask)
-
+            
             guard let jackpot = jackpotOpt else {
                 await MainActor.run {
                     errorMessage = "No jackpot found for selected date."
@@ -184,7 +184,7 @@ extension FindWinnerView {
                 }
                 return
             }
-
+            
             let comps: [ResultComparison] = results.map { result in
                 let matched = Set(result.numbers).intersection(Set(jackpot.numbers)).sorted()
                 return ResultComparison(
@@ -194,7 +194,7 @@ extension FindWinnerView {
                     matchedNumbers: matched
                 )
             }
-
+            
             await MainActor.run {
                 comparisons = comps.sorted { $0.matchCount > $1.matchCount }
                 isLoading = false
@@ -211,7 +211,7 @@ extension FindWinnerView {
 struct NumberCountView: View {
     let title: String
     let numbers: [Int]
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)

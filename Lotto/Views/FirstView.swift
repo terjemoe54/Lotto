@@ -31,6 +31,7 @@ struct FirstView: View {
                         .font(.largeTitle)
                         .bold()
                         .padding(.top, 20)
+                    
                     Spacer()
                     HStack {
                         Spacer()
@@ -67,7 +68,9 @@ struct FirstView: View {
                         .padding()
                         .font(.largeTitle)
                         .bold()
-                    
+                    Rectangle()
+                        .frame(height: 4)
+                        .foregroundStyle(.black)
                     Spacer()
                     
                     HStack {
@@ -109,31 +112,44 @@ struct FirstView: View {
                         .font(.largeTitle)
                         .bold()
                     
-                    Spacer()
+                    // Spacer()
+                    Rectangle()
+                        .frame(height: 4)
+                        .foregroundStyle(.black)
                     
-                    Button(action: {
-                        showNumberCountView = true
-                    }) {
-                        Image(systemName: "function")   // Replace with your asset name
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                    HStack{
+                        VStack {
+                            Button(action: {
+                                showNumberCountView = true
+                            }) {
+                                Image(systemName: "function")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            
+                            Text("Statistikk")
+                        }
+                        .padding()
+                        
+                        VStack {
+                            Button(action: {
+                                showFindWinnerView = true
+                            }) {
+                                Image(systemName: "flag.2.crossed")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            Text("Sjekk Vinner")
+                        }
+                        .padding()
+                        
                     }
-                    .buttonStyle(.borderedProminent)
                     
-                    Text("Statistikk Tall")
-                    
-                    Button(action: {
-                        showFindWinnerView = true
-                    }) {
-                        Image(systemName: "flag.2.crossed")   // Replace with your asset name
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    
-                    Text("Sjekk Vinner")
                     
                     Spacer()
                 }
