@@ -97,7 +97,6 @@ struct NewJackpotView: View {
                     }
                     .disabled((jackpot.nr1 < 1 || jackpot.nr2 < 1 || jackpot.nr3 < 1 || jackpot.nr4 < 1 || jackpot.nr5 < 1 || jackpot.nr6 < 1 || jackpot.nr7 < 1 || jackpot.nr8 < 1 ) || !jackpot.dato.isSaturday)
                     .buttonStyle(.borderedProminent)
-                    
                 }
             }
             

@@ -1,18 +1,18 @@
 //
-//  ListRows.swift
+//  ListMyCupons.swift
 //  Lotto
 //
-//  Created by Terje Moe on 02/02/2026.
+//  Created by Terje Moe on 06/02/2026.
 //
 
 import SwiftUI
 import SwiftData
 
-struct ListRowsView: View {
+struct ListLotteryView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) var dismiss
-    @Query(sort: \JackPot.dato, order: .reverse) private var jackpots: [JackPot]
-    @State private var rowToDelete: JackPot? = nil
+    @Query(sort: \Result.dato, order: .reverse) private var results: [Result]
+    @State private var rowToDelete: Result? = nil
     @State private var showConfirmation = false
     
     var body: some View {
@@ -21,31 +21,27 @@ struct ListRowsView: View {
         }
         .buttonStyle(.borderedProminent)
         
-        Text("Antall Trekninger: \(jackpots.count)")
+        Text("Antall Kuponger: \(results.count)")
         ZStack {
-            List(jackpots) { jackpot in
+            List(results) { result in
                 VStack(alignment: .leading) {
-                    Text(formattedDate(jackpot.dato))
-                    Text("Uke: \(jackpot.weekNr)")
+                    Text(formattedDate(result.dato))
+                    Text("Uke: \(result.weekNr)")
                         .font(.headline)
                     HStack {
-                        Text("\(jackpot.nr1)")
-                        Text("\(jackpot.nr2)")
-                        Text("\(jackpot.nr3)")
-                        Text("\(jackpot.nr4)")
-                        Text("\(jackpot.nr5)")
-                        Text("\(jackpot.nr6)")
-                        Text("\(jackpot.nr7)")
-                        Text("\(jackpot.nr8)")
+                        Text("\(result.nr1)")
+                        Text("\(result.nr2)")
+                        Text("\(result.nr3)")
+                        Text("\(result.nr4)")
+                        Text("\(result.nr5)")
+                        Text("\(result.nr6)")
+                        Text("\(result.nr7)")
                     }
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    
                     Button(role: .destructive) {
-                        rowToDelete = jackpot
+                        rowToDelete = result
                         showConfirmation.toggle()
-                        
-                        // context.delete(jackpot)
                     }
                 }
             }
@@ -65,7 +61,6 @@ struct ListRowsView: View {
                     Text("Slett")
                 }
                 Button(role: .confirm) {
-                    
                 } label: {
                     Text("Avbryt")
                 }
@@ -73,8 +68,8 @@ struct ListRowsView: View {
             message: { item in
                 Text("Er du sikker på at du vil slette trekningen \(formattedDate(item.dato))?")
             })
-        
     }
+    
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "nb_NO")
@@ -82,10 +77,8 @@ struct ListRowsView: View {
         return formatter.string(from: date)
     }
     
-    
-    
 }
 
 #Preview {
-    ListRowsView()
+    ListLotteryView()
 }

@@ -15,70 +15,131 @@ struct FirstView: View {
     @State private var showRegisterView = false
     @State private var showNumberCountView = false
     @State private var showMyLotteryView = false
+    @State private var showListLotteryView = false
+    @State private var showFindWinnerView = false
+    
     var body: some View {
-       NavigationStack {
-           ZStack{
-               Image("LotteryBackground")
-                   .resizable()
-                   .scaledToFill()
-                   .opacity(0.2)
-                   .ignoresSafeArea()
-               VStack {
-                  Spacer()
-                   Button(action: {
-                       showMyLotteryView = true
-                          }) {
-                              Image(systemName: "bitcoinsign.ring.dashed")   // Replace with your asset name
-                                  .resizable()
-                                  .frame(width: 50, height: 50)
-                                  .clipShape(RoundedRectangle(cornerRadius: 10))
-                          }
-                          .buttonStyle(.borderedProminent)
-                   
-                  Text("Registrere Spill")
-                   Spacer()
-                   
-                   Button(action: {
-                       showListRows = true
-                          }) {
-                              Image(systemName: "pencil.and.list.clipboard")   // Replace with your asset name
-                                  .resizable()
-                                  .frame(width: 50, height: 50)
-                                  .clipShape(RoundedRectangle(cornerRadius: 10))
-                          }
-                          .buttonStyle(.borderedProminent)
-                   
-                  Text("Liste Alle Poster")
-                   Spacer()
-                   Button(action: {
-                       showRegisterView = true
-                          }) {
-                              Image(systemName: "list.bullet.circle.fill")   // Replace with your asset name
-                                  .resizable()
-                                  .frame(width: 50, height: 50)
-                                  .clipShape(RoundedRectangle(cornerRadius: 10))
-                          }
-                          .buttonStyle(.borderedProminent)
-                   
-                  Text("Registrere Trekninger")
-                   Spacer()
-                   Button(action: {
-                       showNumberCountView = true
-                          }) {
-                              Image(systemName: "function")   // Replace with your asset name
-                                  .resizable()
-                                  .frame(width: 50, height: 50)
-                                  .clipShape(RoundedRectangle(cornerRadius: 10))
-                          }
-                          .buttonStyle(.borderedProminent)
-                   
-                  Text("Statistikk Tall")
-                   Spacer()
+        NavigationStack {
+            ZStack{
+                Image("LotteryBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.2)
+                    .ignoresSafeArea()
+                VStack {
+                    Text("LOTTO")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.top, 20)
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Button(action: {
+                                showMyLotteryView = true
+                            }) {
+                                Image(systemName: "bitcoinsign.ring.dashed")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding()
+                            Text("Levere")
+                        }
+                        
+                        VStack {
+                            Button(action: {
+                                showListLotteryView = true
+                            }) {
+                                Image(systemName: "pencil.and.list.clipboard")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding()
+                            Text("Liste")
+                        }
+                        Spacer()
+                    }
+                    Text("Spill")
+                        .padding()
+                        .font(.largeTitle)
+                        .bold()
+                    
+                    Spacer()
+                    
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Button(action: {
+                                showRegisterView = true
+                            }) {
+                                Image(systemName: "list.bullet.circle.fill")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            
+                            Text("Registrer Ny")
+                            
+                        }
+                        .padding()
+                        
+                        VStack {
+                            Button(action: {
+                                showListRows = true
+                            }) {
+                                Image(systemName: "pencil.and.list.clipboard")   // Replace with your asset name
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .buttonStyle(.borderedProminent)
+                            Text("Liste Alle")
+                        }
+                        .padding()
+                        Spacer()
+                    }
+                    
+                    Text("Trekninger" )
+                        .padding(.top,10)
+                        .font(.largeTitle)
+                        .bold()
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        showNumberCountView = true
+                    }) {
+                        Image(systemName: "function")   // Replace with your asset name
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Text("Statistikk Tall")
+                    
+                    Button(action: {
+                        showFindWinnerView = true
+                    }) {
+                        Image(systemName: "flag.2.crossed")   // Replace with your asset name
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Text("Sjekk Vinner")
+                    
+                    Spacer()
                 }
-           }
-           
-       }
-       .task {  // Load Jackpot rows from lotto.json file if Swiftdata is empty
+            }
+        }
+        .task {  // Load Jackpot rows from lotto.json file if Swiftdata is empty
             if self.jackpots.isEmpty {
                 let jackpots = loadJackpots()
                 for jackpot in jackpots {
@@ -87,18 +148,23 @@ struct FirstView: View {
                 }
             }
         }
-       .sheet(isPresented: $showMyLotteryView) {
-        MyLotteryView()
-       }
-       .sheet(isPresented: $showListRows) {
-        ListRowsView()
+        .sheet(isPresented: $showMyLotteryView) {
+            MyLotteryView()
         }
-       .sheet(isPresented: $showRegisterView) {
-        NewJackpotView()
+        .sheet(isPresented: $showListLotteryView) {
+            ListLotteryView()
         }
-        
-       .sheet(isPresented: $showNumberCountView) {
-        NumberCountsView()
+        .sheet(isPresented: $showListRows) {
+            ListRowsView()
+        }
+        .sheet(isPresented: $showRegisterView) {
+            NewJackpotView()
+        }
+        .sheet(isPresented: $showNumberCountView) {
+            NumberCountsView()
+        }
+        .sheet(isPresented: $showFindWinnerView) {
+            FindWinnerView()
         }
     }
     
@@ -118,7 +184,7 @@ struct FirstView: View {
             return []
         }
     }
-  
+    
     func getWeekNumber(from date: Date) -> Int {
         // Use current calendar,, or specify for consistent results
         let calendar = Calendar.current
@@ -127,7 +193,7 @@ struct FirstView: View {
     }
     
 }
-   
+
 
 #Preview {
     FirstView()

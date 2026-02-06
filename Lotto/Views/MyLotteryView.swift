@@ -49,7 +49,7 @@ struct MyLotteryView: View {
     @State private var nr5Text: String = ""
     @State private var nr6Text: String = ""
     @State private var nr7Text: String = ""
-
+    
     private enum Field: Hashable { case nr1, nr2, nr3, nr4, nr5, nr6, nr7 }
     @FocusState private var focusedField: Field?
     
@@ -78,7 +78,7 @@ struct MyLotteryView: View {
                                 .numberFieldStyle()
                                 .frame(width: 60)
                         }
-
+                        
                         TextField("2", text: $nr2Text)
                             .keyboardType(.numberPad)
                             .submitLabel(.next)
@@ -87,7 +87,7 @@ struct MyLotteryView: View {
                             .onSubmit { focusedField = .nr3 }
                             .numberFieldStyle()
                             .frame(width: 60)
-
+                        
                         TextField("3", text: $nr3Text)
                             .keyboardType(.numberPad)
                             .submitLabel(.next)
@@ -96,7 +96,7 @@ struct MyLotteryView: View {
                             .onSubmit { focusedField = .nr4 }
                             .numberFieldStyle()
                             .frame(width: 60)
-
+                        
                         TextField("4", text: $nr4Text)
                             .keyboardType(.numberPad)
                             .submitLabel(.next)
@@ -114,7 +114,7 @@ struct MyLotteryView: View {
                             .onSubmit { focusedField = .nr6 }
                             .numberFieldStyle()
                             .frame(width: 60)
-
+                        
                         TextField("6", text: $nr6Text)
                             .keyboardType(.numberPad)
                             .submitLabel(.next)
@@ -123,7 +123,7 @@ struct MyLotteryView: View {
                             .onSubmit { focusedField = .nr7 }
                             .numberFieldStyle()
                             .frame(width: 60)
-
+                        
                         TextField("7", text: $nr7Text)
                             .keyboardType(.numberPad)
                             .submitLabel(.done)
@@ -144,7 +144,7 @@ struct MyLotteryView: View {
                         let n5 = Int(nr5Text) ?? 0
                         let n6 = Int(nr6Text) ?? 0
                         let n7 = Int(nr7Text) ?? 0
-
+                        
                         // Assign to model
                         result.nr1 = n1
                         result.nr2 = n2
@@ -153,7 +153,7 @@ struct MyLotteryView: View {
                         result.nr5 = n5
                         result.nr6 = n6
                         result.nr7 = n7
-
+                        
                         result.weekNr = getWeekNumber(from: result.dato)
                         context.insert(result)
                         do {

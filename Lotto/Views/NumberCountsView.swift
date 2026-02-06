@@ -164,7 +164,6 @@ struct NumberCountsView: View {
                 avgGaps[number] = avg
             }
         }
-        
         return (avgGaps, lastDates)
     }
     
@@ -172,7 +171,6 @@ struct NumberCountsView: View {
         do {
             let descriptor = FetchDescriptor<JackPot>()
             let jackpots = try context.fetch(descriptor)
-            
             let stats = statsPerNumber(from: jackpots)
             self.averageDaysBetween = stats.avgGaps
             self.lastDatePerNumber = stats.lastDates
