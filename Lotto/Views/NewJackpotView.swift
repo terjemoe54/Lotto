@@ -12,6 +12,18 @@ struct NewJackpotView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \JackPot.dato, order: .forward) private var jackpots: [JackPot]
     @Environment(\.dismiss) var dismiss
+    @State private var nr1Text: String = ""
+    @State private var nr2Text: String = ""
+    @State private var nr3Text: String = ""
+    @State private var nr4Text: String = ""
+    @State private var nr5Text: String = ""
+    @State private var nr6Text: String = ""
+    @State private var nr7Text: String = ""
+    @State private var nr8Text: String = ""
+    
+    private enum Field: Hashable { case nr1, nr2, nr3, nr4, nr5, nr6, nr7 , nr8}
+    @FocusState private var focusedField: Field?
+    
     @State private var jackpot: JackPot = JackPot(
         dato: Date(),
         nr1: 0, nr2: 0, nr3: 0, nr4: 0,
@@ -52,73 +64,159 @@ struct NewJackpotView: View {
                     
                     DatePicker("Trekningsdato", selection: $jackpot.dato, displayedComponents: .date)
                         .padding(36)
-                    
-                    HStack {
-                        Text("Nummer1: ")
-                        TextField("Nr:1", value: $jackpot.nr1, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
+                    VStack {
+                        Group {
+                            Text("Registrer Vinnertall Her")
+                                .font(.headline).foregroundStyle(.black)
+                            TextField("1", text: $nr1Text)
+                                .keyboardType(.numberPad)
+                                .submitLabel(.next)
+                                .focused($focusedField, equals: .nr1)
+                                .onChange(of: nr1Text) { nr1Text = nr1Text.filter { $0.isNumber } }
+                                .onSubmit { focusedField = .nr2 }
+                                .numberFieldStyle()
+                                .frame(width: 60)
+                        }
+                        TextField("2", text: $nr2Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .nr2)
+                            .onChange(of: nr2Text) { nr2Text = nr2Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = .nr3 }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("3", text: $nr3Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .nr3)
+                            .onChange(of: nr3Text) { nr3Text = nr3Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = .nr4 }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("4", text: $nr4Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .nr4)
+                            .onChange(of: nr4Text) { nr4Text = nr4Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = .nr5 }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("5", text: $nr5Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .nr5)
+                            .onChange(of: nr5Text) { nr5Text = nr5Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = .nr6 }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("6", text: $nr6Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.next)
+                            .focused($focusedField, equals: .nr6)
+                            .onChange(of: nr6Text) { nr6Text = nr6Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = .nr7 }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("7", text: $nr7Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.done)
+                            .focused($focusedField, equals: .nr7)
+                            .onChange(of: nr7Text) { nr7Text = nr7Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = nil }
+                            .numberFieldStyle()
+                            .frame(width: 60)
+                        
+                        TextField("8", text: $nr8Text)
+                            .keyboardType(.numberPad)
+                            .submitLabel(.done)
+                            .focused($focusedField, equals: .nr8)
+                            .onChange(of: nr8Text) { nr8Text = nr8Text.filter { $0.isNumber } }
+                            .onSubmit { focusedField = nil }
+                            .numberFieldStyle()
+                            .frame(width: 60)
                     }
-                    HStack {
-                        Text("Nummer2: ")
-                        TextField("Nr:2", value: $jackpot.nr2, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer3: ")
-                        TextField("Nr:3", value: $jackpot.nr3, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer4: ")
-                        TextField("Nr:4", value: $jackpot.nr4, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer5: ")
-                        TextField("Nr:5", value: $jackpot.nr5, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer6: ")
-                        TextField("Nr:6", value: $jackpot.nr6, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer7: ")
-                        TextField("Nr:7", value: $jackpot.nr7, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
-                    HStack {
-                        Text("Nummer8: ")
-                        TextField("Nr:8", value: $jackpot.nr8, formatter: intFormatter)
-                            .padding(.horizontal, 16).background(
-                                Capsule().fill(Color.blue.opacity(0.2)))
-                    }
+                    .padding(.horizontal, 4)
                     
                     Button("Save jackpot") {
+                        jackpot.weekNr = getWeekNumber(from: jackpot.dato)
+                        // Parse inputs
+                        let n1 = Int(nr1Text) ?? 0
+                        let n2 = Int(nr2Text) ?? 0
+                        let n3 = Int(nr3Text) ?? 0
+                        let n4 = Int(nr4Text) ?? 0
+                        let n5 = Int(nr5Text) ?? 0
+                        let n6 = Int(nr6Text) ?? 0
+                        let n7 = Int(nr7Text) ?? 0
+                        let n8 = Int(nr8Text) ?? 0
+                        
+                        // Assign to model
+                        jackpot.nr1 = n1
+                        jackpot.nr2 = n2
+                        jackpot.nr3 = n3
+                        jackpot.nr4 = n4
+                        jackpot.nr5 = n5
+                        jackpot.nr6 = n6
+                        jackpot.nr7 = n7
+                        jackpot.nr8 = n8
                         jackpot.weekNr = getWeekNumber(from: jackpot.dato)
                         context.insert(jackpot)
                         do {
                             try context.save()
+                            // Reset form for new entry, keep date
+                            let currentDate = jackpot.dato
+                            jackpot = JackPot()
+                            jackpot.dato = currentDate
+                            nr1Text = ""
+                            nr2Text = ""
+                            nr3Text = ""
+                            nr4Text = ""
+                            nr5Text = ""
+                            nr6Text = ""
+                            nr7Text = ""
+                            nr8Text = ""
+                            focusedField = .nr1
                         } catch {
                             print("Save failed:", error.localizedDescription)
                         }
                     }
-                    .disabled((jackpot.nr1 < 1 || jackpot.nr2 < 1 || jackpot.nr3 < 1 || jackpot.nr4 < 1 || jackpot.nr5 < 1 || jackpot.nr6 < 1 || jackpot.nr7 < 1 || jackpot.nr8 < 1 ) || !jackpot.dato.isSaturday)
+                    .disabled({
+                        let values = [nr1Text, nr2Text, nr3Text, nr4Text, nr5Text, nr6Text, nr7Text, nr8Text].compactMap { Int($0) }
+                        let allValid = values.count == 8 && values.allSatisfy { $0 >= 1 }
+                        return !allValid || !jackpot.dato.isSaturday
+                    }())
                     .buttonStyle(.borderedProminent)
-                }
+                    .padding(.top, 20)
             }
-            
+        }
+        
+    }
+     .onAppear {
+            // Initialize a fresh result when the view appears
+            jackpot = JackPot()
+            nr1Text = ""
+            nr2Text = ""
+            nr3Text = ""
+            nr4Text = ""
+            nr5Text = ""
+            nr6Text = ""
+            nr7Text = ""
+            nr8Text = ""
+            focusedField = .nr1
         }
         .background(Color.blue)
         
+    }
+    
+    func getWeekNumber(from date: Date) -> Int {
+        // Use current calendar,, or specify for consistent results
+        let calendar = Calendar.current
+        // Returns 1-53
+        return calendar.component(.weekOfYear, from: date)
     }
     
     func deleteAll<MyModel: PersistentModel>(
@@ -128,14 +226,8 @@ struct NewJackpotView: View {
         try context.delete(model: MyModel.self) // predicate defaults to nil → deletes all of this type [web:1][web:2]
         try context.save()
     }
-    
-    func getWeekNumber(from date: Date) -> Int {
-        // Use current calendar,, or specify for consistent results
-        let calendar = Calendar.current
-        // Returns 1-53
-        return calendar.component(.weekOfYear, from: date)
-    }
-}
+  }
+
 
 extension Date {
     var isSaturday: Bool {
