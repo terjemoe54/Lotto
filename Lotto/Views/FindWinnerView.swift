@@ -22,8 +22,8 @@ struct FindWinnerView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Select date") {
-                    DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
+                Section("Velg Dato") {
+                    DatePicker("Dat0", selection: $selectedDate, displayedComponents: [.date])
                         .datePickerStyle(.compact)
                 }
                 
@@ -33,41 +33,41 @@ struct FindWinnerView: View {
                     } label: {
                         HStack {
                             if isLoading { ProgressView().padding(.trailing, 4) }
-                            Text("Compare with Jackpot")
+                            Text("Kontroller dine rekker")
                         }
                     }
                     .disabled(isLoading)
                 }
                 
                 if let errorMessage {
-                    Section("Error") {
+                    Section("Feil") {
                         Text(errorMessage)
                             .foregroundStyle(.red)
                     }
                 }
                 
-                Section("Matches") {
+                Section("Treff") {
                     if comparisons.isEmpty {
-                        Text("No comparisons yet. Choose a date and tap Compare.")
+                        Text("Velg en dato og trykk Kontroll.")
                             .foregroundStyle(.secondary)
                     } else {
                         List(comparisons) { item in
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack {
-                                    Text("Result ID: \(item.result.id)")
+                                    Text("Resultat ID: \(item.result.id)")
                                     Spacer()
-                                    Text("Matches: \(item.matchCount)")
+                                    Text("Treff: \(item.matchCount)")
                                         .bold()
                                 }
                                 Text(item.result.date, style: .date)
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                                 HStack(alignment: .top, spacing: 12) {
-                                    NumberCountView(title: "Result numbers", numbers: item.result.numbers)
-                                    NumberCountView(title: "Jackpot numbers", numbers: item.jackpot.numbers)
+                                    NumberCountView(title: "Dine nummer", numbers: item.result.numbers)
+                                    NumberCountView(title: "Vinner nummer", numbers: item.jackpot.numbers)
                                 }
                                 if !item.matchedNumbers.isEmpty {
-                                    Text("Matched: \(item.matchedNumbers.sorted().map(String.init).joined(separator: ", "))")
+                                    Text("Treff: \(item.matchedNumbers.sorted().map(String.init).joined(separator: ", "))")
                                         .font(.footnote)
                                         .foregroundStyle(.green)
                                 }
@@ -78,7 +78,7 @@ struct FindWinnerView: View {
                     }
                 }
             }
-            .navigationTitle("Find Winner")
+            .navigationTitle("Finn Vinner")
         }
     }
 }
@@ -179,7 +179,7 @@ extension FindWinnerView {
             
             guard let jackpot = jackpotOpt else {
                 await MainActor.run {
-                    errorMessage = "No jackpot found for selected date."
+                    errorMessage = "Ingen registrert Vinner Rekke funnet for valgte dato."
                     isLoading = false
                 }
                 return
