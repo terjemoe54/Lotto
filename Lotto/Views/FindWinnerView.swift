@@ -184,6 +184,7 @@ extension FindWinnerView {
                 }
                 return
             }
+       
             
             let comps: [ResultComparison] = results.map { result in
                 let matched = Set(result.numbers).intersection(Set(jackpot.numbers)).sorted()

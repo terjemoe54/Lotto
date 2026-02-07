@@ -28,10 +28,26 @@ struct NewJackpotView: View {
     var body: some View {
         ZStack {
             Form {
-                Button("Ferdig") {
-                    dismiss()
+             HStack {
+                 Button("Ferdig") {
+                     dismiss()
+                 }
+                 .buttonStyle(.borderedProminent)
+                 
+                 Button("Slett all poster") {
+                             do {
+                                 try deleteAll(of: JackPot.self, in: context)
+                             } catch {
+                                 // handle error
+                             }
+                         }
+                 .foregroundStyle(.red)
+                 .tint(.yellow)
+                 .buttonStyle(.borderedProminent)
+                 
                 }
-                .buttonStyle(.borderedProminent)
+                
+                
                 VStack(alignment:.center) {
                     
                     DatePicker("Trekningsdato", selection: $jackpot.dato, displayedComponents: .date)
@@ -103,6 +119,14 @@ struct NewJackpotView: View {
         }
         .background(Color.blue)
         
+    }
+    
+    func deleteAll<MyModel: PersistentModel>(
+        of type: MyModel.Type,
+        in context: ModelContext
+    ) throws {
+        try context.delete(model: MyModel.self) // predicate defaults to nil → deletes all of this type [web:1][web:2]
+        try context.save()
     }
     
     func getWeekNumber(from date: Date) -> Int {
