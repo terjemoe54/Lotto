@@ -1,7 +1,7 @@
 //
 //  NewJackpotView.swift
 //  Lotto
-//
+// ny
 //  Created by Terje Moe on 02/02/2026.
 //
 
