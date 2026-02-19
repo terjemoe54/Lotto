@@ -291,7 +291,9 @@ struct PrintableResultsView: View {
                         Text("Treff: \(item.matchCount)")
                             .font(.headline)
                         Text("Dine nummer: \(item.result.numbers.sorted().map(String.init).joined(separator: ", "))")
+                            .font(.caption2)
                         Text("Vinnernummer: \(item.jackpot.numbers.sorted().map(String.init).joined(separator: ", "))")
+                            .font(.caption2)
                         if let ekstra = item.jackpot.extraNumber {
                             Text("Ekstra tall: \(ekstra)")
                                 .font(.caption2)
@@ -305,6 +307,7 @@ struct PrintableResultsView: View {
                         }
                         if !item.matchedNumbers.isEmpty {
                             Text("Treff: \(item.matchedNumbers.sorted().map(String.init).joined(separator: ", "))")
+                                .font(.caption2)
                                 .foregroundStyle(.green)
                         }
                         Divider()
