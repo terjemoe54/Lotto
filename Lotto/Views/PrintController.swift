@@ -25,62 +25,35 @@ struct PrintController<Content: View>: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
     
-    /// Renders the content and sends it to the printer as page images.
+    /// Renders the content to images and sends them to the printer.
     private func printView(from controller: UIViewController) {
-        let pageSize = CGSize(width: 612, height: 792) // Letter-size points
+        let pageSize = CGSize(width: 595, height: 842) // A4-size points
         let margin: CGFloat = 24
         let headerHeight: CGFloat = 36
         let footerHeight: CGFloat = 28
-        let contentWidth = pageSize.width - (margin * 2)
-        let contentHeightPerPage = pageSize.height - (margin * 2) - headerHeight - footerHeight
-        let headerText = formattedHeader()
+        let printableHeight = pageSize.height - (margin * 2) - headerHeight - footerHeight
+        let printableRect = CGRect(
+            x: margin,
+            y: margin + headerHeight,
+            width: pageSize.width - (margin * 2),
+            height: printableHeight
+        )
+
         let rootView = content
-            .frame(width: contentWidth)
+            .frame(width: printableRect.width)
             .padding()
             .background(Color.white)
-        let hosting = UIHostingController(rootView: rootView)
-        hosting.view.backgroundColor = UIColor.white
-
-        let targetSize = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
-        let contentSize: CGSize
-        if #available(iOS 16.0, *) {
-            contentSize = hosting.sizeThatFits(in: targetSize)
-        } else {
-            contentSize = hosting.view.systemLayoutSizeFitting(
-                targetSize,
-                withHorizontalFittingPriority: .required,
-                verticalFittingPriority: .fittingSizeLevel
-            )
-        }
-
-        let totalHeight = max(contentHeightPerPage, contentSize.height)
-        hosting.view.bounds = CGRect(x: 0, y: 0, width: contentWidth, height: totalHeight)
-        hosting.view.layoutIfNeeded()
-
-        let pageCount = Int(ceil(totalHeight / contentHeightPerPage))
-        let renderer = UIGraphicsImageRenderer(size: pageSize)
-        var images: [UIImage] = []
-        images.reserveCapacity(pageCount)
-
-        for pageIndex in 0..<pageCount {
-            let image = renderer.image { context in
-                let offsetY = CGFloat(pageIndex) * contentHeightPerPage
-                context.cgContext.translateBy(x: margin, y: margin + headerHeight - offsetY)
-                hosting.view.drawHierarchy(in: hosting.view.bounds, afterScreenUpdates: true)
-                context.cgContext.translateBy(x: -margin, y: -margin - headerHeight + offsetY)
-                drawHeaderFooter(
-                    in: context.cgContext,
-                    pageSize: pageSize,
-                    headerText: headerText,
-                    pageIndex: pageIndex,
-                    pageCount: pageCount,
-                    margin: margin,
-                    headerHeight: headerHeight,
-                    footerHeight: footerHeight
-                )
-            }
-            images.append(image)
-        }
+        let headerText = formattedHeader()
+        let fullImage = renderContentImage(view: rootView, width: printableRect.width)
+        let images = sliceAndComposePages(
+            fullImage: fullImage,
+            pageSize: pageSize,
+            printableRect: printableRect,
+            headerText: headerText,
+            headerHeight: headerHeight,
+            footerHeight: footerHeight,
+            margin: margin
+        )
 
         let printInfo = UIPrintInfo(dictionary: nil)
         printInfo.outputType = .general
@@ -109,42 +82,95 @@ struct PrintController<Content: View>: UIViewControllerRepresentable {
         return "\(title) – \(formatter.string(from: date))"
     }
 
-    /// Draws header and footer directly on the page.
-    private func drawHeaderFooter(
-        in context: CGContext,
-        pageSize: CGSize,
-        headerText: String,
-        pageIndex: Int,
-        pageCount: Int,
-        margin: CGFloat,
-        headerHeight: CGFloat,
-        footerHeight: CGFloat
-    ) {
-        if !headerText.isEmpty {
-            let headerRect = CGRect(
-                x: margin,
-                y: margin,
-                width: pageSize.width - (margin * 2),
-                height: headerHeight
-            )
-            let headerAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.boldSystemFont(ofSize: 14),
-                .foregroundColor: UIColor.black
-            ]
-            NSString(string: headerText).draw(in: headerRect, withAttributes: headerAttrs)
+    private func renderContentImage(view: some View, width: CGFloat) -> UIImage {
+        if #available(iOS 16.0, *) {
+            let renderer = ImageRenderer(content: view)
+            renderer.proposedSize = .init(width: width, height: nil)
+            renderer.scale = UIScreen.main.scale
+            if let image = renderer.uiImage {
+                return image
+            }
         }
 
-        let footerText = "Page \(pageIndex + 1) of \(pageCount)"
-        let footerRect = CGRect(
-            x: margin,
-            y: pageSize.height - margin - footerHeight,
-            width: pageSize.width - (margin * 2),
-            height: footerHeight
-        )
-        let footerAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 12),
-            .foregroundColor: UIColor.darkGray
-        ]
-        NSString(string: footerText).draw(in: footerRect, withAttributes: footerAttrs)
+        let fallback = UIHostingController(rootView: view)
+        fallback.view.backgroundColor = UIColor.white
+        let targetSize = CGSize(width: width, height: 10000)
+        fallback.view.frame = CGRect(origin: .zero, size: targetSize)
+        fallback.view.setNeedsLayout()
+        fallback.view.layoutIfNeeded()
+
+        let renderer = UIGraphicsImageRenderer(size: fallback.view.bounds.size)
+        return renderer.image { context in
+            fallback.view.layer.render(in: context.cgContext)
+        }
+    }
+
+    private func sliceAndComposePages(
+        fullImage: UIImage,
+        pageSize: CGSize,
+        printableRect: CGRect,
+        headerText: String,
+        headerHeight: CGFloat,
+        footerHeight: CGFloat,
+        margin: CGFloat
+    ) -> [UIImage] {
+        guard let cgImage = fullImage.cgImage else {
+            return []
+        }
+
+        let scale = fullImage.scale
+        let contentHeightPoints = fullImage.size.height
+        let pageCount = max(1, Int(ceil(contentHeightPoints / printableRect.height)))
+        let renderer = UIGraphicsImageRenderer(size: pageSize)
+        var images: [UIImage] = []
+        images.reserveCapacity(pageCount)
+
+        let contentWidthPixels = CGFloat(cgImage.width)
+        let sliceHeightPixels = printableRect.height * scale
+
+        for pageIndex in 0..<pageCount {
+            let originY = CGFloat(pageIndex) * sliceHeightPixels
+            let height = min(sliceHeightPixels, CGFloat(cgImage.height) - originY)
+            let cropRect = CGRect(x: 0, y: originY, width: contentWidthPixels, height: height)
+            guard let sliceCg = cgImage.cropping(to: cropRect) else { continue }
+            let slice = UIImage(cgImage: sliceCg, scale: scale, orientation: .up)
+
+            let pageImage = renderer.image { context in
+                context.cgContext.setFillColor(UIColor.white.cgColor)
+                context.cgContext.fill(CGRect(origin: .zero, size: pageSize))
+
+                let headerRect = CGRect(
+                    x: margin,
+                    y: margin,
+                    width: pageSize.width - (margin * 2),
+                    height: headerHeight
+                )
+                if !headerText.isEmpty {
+                    let headerAttrs: [NSAttributedString.Key: Any] = [
+                        .font: UIFont.boldSystemFont(ofSize: 14),
+                        .foregroundColor: UIColor.black
+                    ]
+                    NSString(string: headerText).draw(in: headerRect, withAttributes: headerAttrs)
+                }
+
+                let footerText = "Page \(pageIndex + 1) of \(pageCount)"
+                let footerRect = CGRect(
+                    x: margin,
+                    y: pageSize.height - margin - footerHeight,
+                    width: pageSize.width - (margin * 2),
+                    height: footerHeight
+                )
+                let footerAttrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.systemFont(ofSize: 12),
+                    .foregroundColor: UIColor.darkGray
+                ]
+                NSString(string: footerText).draw(in: footerRect, withAttributes: footerAttrs)
+
+                slice.draw(in: printableRect)
+            }
+            images.append(pageImage)
+        }
+
+        return images
     }
 }
