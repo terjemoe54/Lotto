@@ -44,7 +44,13 @@ struct PrintController<Content: View>: UIViewControllerRepresentable {
             .padding()
             .background(Color.white)
         let headerText = formattedHeader()
-        let fullImage = renderContentImage(view: rootView, width: printableRect.width)
+        let screenScale = controller.view.window?.windowScene?.screen.scale
+            ?? controller.traitCollection.displayScale
+        let fullImage = renderContentImage(
+            view: rootView,
+            width: printableRect.width,
+            scale: screenScale
+        )
         let images = sliceAndComposePages(
             fullImage: fullImage,
             pageSize: pageSize,
@@ -82,11 +88,11 @@ struct PrintController<Content: View>: UIViewControllerRepresentable {
         return "\(title) – \(formatter.string(from: date))"
     }
 
-    private func renderContentImage(view: some View, width: CGFloat) -> UIImage {
+    private func renderContentImage(view: some View, width: CGFloat, scale: CGFloat) -> UIImage {
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: view)
             renderer.proposedSize = .init(width: width, height: nil)
-            renderer.scale = UIScreen.main.scale
+            renderer.scale = scale
             if let image = renderer.uiImage {
                 return image
             }

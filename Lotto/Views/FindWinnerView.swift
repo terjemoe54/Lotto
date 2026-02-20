@@ -277,48 +277,64 @@ struct PrintableResultsView: View {
     let comparisons: [ResultComparison]
     let selectedDate: Date
     
+    private let printablePageHeight: CGFloat = 730
+    private let rowsPerPage: Int = 6
+    private let horizontalPadding: CGFloat = 16
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Resultater for \(selectedDate.formatted(date: .long, time: .omitted))")
-                .font(.title2)
-                .bold()
-            Divider()
-            if comparisons.isEmpty {
-                Text("Ingen rekker funnet for valgt dato.")
-            } else {
-                ForEach(comparisons) { item in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Treff: \(item.matchCount)")
-                            .font(.headline)
-                        Text("Dine nummer: \(item.result.numbers.sorted().map(String.init).joined(separator: ", "))")
-                            .font(.caption2)
-                        Text("Vinnernummer: \(item.jackpot.numbers.sorted().map(String.init).joined(separator: ", "))")
-                            .font(.caption2)
-                        if let ekstra = item.jackpot.extraNumber {
-                            Text("Ekstra tall: \(ekstra)")
-                                .font(.caption2)
-                                .foregroundStyle(.blue)
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(chunkedComparisons.enumerated()), id: \.offset) { index, chunk in
+                VStack(alignment: .leading, spacing: 8) {
+                    if index == 0 && comparisons.isEmpty {
+                        Text("Ingen rekker funnet for valgt dato.")
+                    } else {
+                        ForEach(chunk) { item in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Treff: \(item.matchCount)")
+                                    .font(.subheadline)
+                                Text("Dine nummer: \(item.result.numbers.sorted().map(String.init).joined(separator: ", "))")
+                                    .font(.caption2)
+                                Text("Vinnernummer: \(item.jackpot.numbers.sorted().map(String.init).joined(separator: ", "))")
+                                    .font(.caption2)
+                                if let ekstra = item.jackpot.extraNumber {
+                                    Text("Ekstra tall: \(ekstra)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.blue)
+                                }
+                                if let extra = item.matchedExtraNumber {
+                                    Text("Du traff ekstratall: \(extra)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.orange)
+                                        .bold()
+                                }
+                                if !item.matchedNumbers.isEmpty {
+                                    Text("Treff: \(item.matchedNumbers.sorted().map(String.init).joined(separator: ", "))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.green)
+                                }
+                                Divider()
+                            }
+                            .font(.footnote)
                         }
-                        if let extra = item.matchedExtraNumber {
-                            Text("Du traff ekstratall: \(extra)")
-                                .font(.caption2)
-                                .foregroundStyle(.orange)
-                                .bold()
-                        }
-                        if !item.matchedNumbers.isEmpty {
-                            Text("Treff: \(item.matchedNumbers.sorted().map(String.init).joined(separator: ", "))")
-                                .font(.caption2)
-                                .foregroundStyle(.green)
-                        }
-                        Divider()
                     }
                 }
+                .padding(.horizontal, horizontalPadding)
+                .frame(height: printablePageHeight, alignment: .top)
+                .clipped()
             }
         }
-        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(.black)
         .background(Color.white)
+    }
+
+    private var chunkedComparisons: [[ResultComparison]] {
+        guard !comparisons.isEmpty else {
+            return [[]]
+        }
+        return stride(from: 0, to: comparisons.count, by: rowsPerPage).map { start in
+            Array(comparisons[start..<min(start + rowsPerPage, comparisons.count)])
+        }
     }
 }
 

@@ -275,6 +275,10 @@ struct NumberCountsView: View {
         let counts: [Int: Int]
         let averageDaysBetween: [Int: Double]
         let nextDatePerNumber: [Int: Date]
+
+        private let printablePageHeight: CGFloat = 730
+        private let horizontalPadding: CGFloat = 16
+        private let rowsPerPage: Int = 20
         
         private var sortedCounts: [(Int, Int)] {
             counts
@@ -288,69 +292,79 @@ struct NumberCountsView: View {
         }
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Number Statistikk")
-                    .font(.title2)
-                    .bold()
-                
-                Divider()
-                
-                Text("Totalt antall numre: \(sortedCounts.count)")
-                    .font(.headline)
-                
-                Divider()
-                
-                // Header row
-                HStack {
-                    Spacer()
-                    Text("Count")
-                        .frame(width: 60, alignment: .trailing)
-                    Text("Avg Days")
-                        .frame(width: 80, alignment: .trailing)
-                    Text("Next Date")
-                        .frame(width: 100, alignment: .trailing)
-                    Text("Uke")
-                        .frame(width: 40, alignment: .trailing)
-                }
-                .font(.headline)
-                
-                Divider()
-                
-                // Data rows
-                ForEach(sortedCounts, id: \.0) { number, count in
-                    HStack {
-                        Text("Number \(number)")
-                            .frame(width: 80, alignment: .leading)
-                        Spacer()
-                        Text("\(count)")
-                            .frame(width: 60, alignment: .trailing)
-                            .font(.headline)
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(chunkedCounts.enumerated()), id: \.offset) { index, chunk in
+                    VStack(alignment: .leading, spacing: 8) {
+                        if index == 0 {
+                            Text("Totalt antall numre: \(sortedCounts.count)")
+                                .font(.subheadline)
+                            
+                            Divider()
+                        }
                         
-                        let avg = averageDaysBetween[number]
-                        Text(avg != nil ? String(format: "%.1f", avg!) : "-")
-                            .frame(width: 80, alignment: .trailing)
-                        
-                        if let next = nextDatePerNumber[number] {
-                            Text(next, style: .date)
+                        // Header row
+                        HStack {
+                            Spacer()
+                            Text("Count")
+                                .frame(width: 60, alignment: .trailing)
+                            Text("Avg Days")
+                                .frame(width: 80, alignment: .trailing)
+                            Text("Next Date")
                                 .frame(width: 100, alignment: .trailing)
-                            let weekNumber = Calendar.current.component(.weekOfYear, from: next)
-                            Text("\(weekNumber)")
-                                .frame(width: 40, alignment: .trailing)
-                                .fontWeight(.semibold)
-                        } else {
-                            Text("-")
-                                .frame(width: 100, alignment: .trailing)
-                            Text("_")
+                            Text("Uke")
                                 .frame(width: 40, alignment: .trailing)
                         }
+                        .font(.subheadline)
+                        
+                        Divider()
+                        
+                        // Data rows
+                        ForEach(chunk, id: \.0) { number, count in
+                            HStack {
+                                Text("Number \(number)")
+                                    .frame(width: 80, alignment: .leading)
+                                Spacer()
+                                Text("\(count)")
+                                    .frame(width: 60, alignment: .trailing)
+                                    .font(.footnote)
+                                    .fontWeight(.semibold)
+                                
+                                let avg = averageDaysBetween[number]
+                                Text(avg != nil ? String(format: "%.1f", avg!) : "-")
+                                    .frame(width: 80, alignment: .trailing)
+                                
+                                if let next = nextDatePerNumber[number] {
+                                    Text(next, style: .date)
+                                        .frame(width: 100, alignment: .trailing)
+                                    let weekNumber = Calendar.current.component(.weekOfYear, from: next)
+                                    Text("\(weekNumber)")
+                                        .frame(width: 40, alignment: .trailing)
+                                        .fontWeight(.semibold)
+                                } else {
+                                    Text("-")
+                                        .frame(width: 100, alignment: .trailing)
+                                    Text("_")
+                                        .frame(width: 40, alignment: .trailing)
+                                }
+                            }
+                            .font(.footnote)
+                            Divider()
+                        }
                     }
-                    Divider()
+                    .padding(.horizontal, horizontalPadding)
+                    .frame(height: printablePageHeight, alignment: .top)
+                    .clipped()
                 }
             }
-            .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundStyle(.black)
             .background(Color.white)
+        }
+
+        private var chunkedCounts: [[(Int, Int)]] {
+            stride(from: 0, to: sortedCounts.count, by: rowsPerPage).map { start in
+                Array(sortedCounts[start..<min(start + rowsPerPage, sortedCounts.count)])
+            }
         }
     }
 }
