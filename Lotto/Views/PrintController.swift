@@ -172,7 +172,14 @@ struct PrintController<Content: View>: UIViewControllerRepresentable {
                 ]
                 NSString(string: footerText).draw(in: footerRect, withAttributes: footerAttrs)
 
-                slice.draw(in: printableRect)
+                // Keep the final partial slice at its natural height to avoid vertical stretching.
+                let drawRect = CGRect(
+                    x: printableRect.minX,
+                    y: printableRect.minY,
+                    width: printableRect.width,
+                    height: min(printableRect.height, slice.size.height)
+                )
+                slice.draw(in: drawRect)
             }
             images.append(pageImage)
         }
